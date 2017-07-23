@@ -1,4 +1,6 @@
 import requests
+import json
+import pandas as pd
 
 
 class Toggl(object):
@@ -8,7 +10,13 @@ class Toggl(object):
         self.workspace_id = workspace_id
         self.data_header = {'user_agent': 'upjohnc@gmail.com', 'workspace_id': self.workspace_id}
         self.url_ = 'https://toggl.com/reports/api/v2/details'
-        self.data = None
 
-    def call(self):
-        self.data = requests.get(self.url_, auth=(self.uname, self.pwd), data=self.data_header).text
+    def call_detail_report(self):
+        response = requests.get(self.url_, auth=(self.uname, self.pwd), data=self.data_header).text
+        json_acceptable_string = response.replace("'", "\"")
+        data = json.loads(json_acceptable_string)
+        return data
+
+    @staticmethod
+    def get_details_df(data):
+        return pd.DataFrame(data['data'])
